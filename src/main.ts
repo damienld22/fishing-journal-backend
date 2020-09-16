@@ -1,9 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import fs from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('/etc/letsencrypt/live/241.ip-92-222-68.eu/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/241.ip-92-222-68.eu/fullchain.pem')
+  }
+
+  const app = await NestFactory.create(AppModule, { httpsOptions });
 
   const options = new DocumentBuilder()
     .setTitle('Fishing journal API')
