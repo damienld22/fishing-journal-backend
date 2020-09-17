@@ -14,7 +14,9 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
 
-  app.enableCors();
+  app.enableCors({
+    origin: 'https://dreamy-wescoff-dd59e6.netlify.app/'
+  });
   await app.listen(3000);
 }
 bootstrap();
