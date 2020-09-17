@@ -15,7 +15,7 @@ async function bootstrap() {
 
 
   app.enableCors({
-    origin: 'https://dreamy-wescoff-dd59e6.netlify.app/'
+    origin: /netlify\.app$/
   });
   await app.listen(3000);
 }
