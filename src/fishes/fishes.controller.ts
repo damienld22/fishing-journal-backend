@@ -23,10 +23,10 @@ export class FishesController {
   }
 
   @Get(':id')
-  @ApiResponse({ status: 200, description: 'Get on fish' })
+  @ApiResponse({ status: 200, description: 'Get one fish' })
   @ApiResponse({ status: 404, description: 'Fish does not exists' })
   @ApiResponse({ status: 500, description: 'Failed to get fish by ID' })
-  async getFishById(@Param() params, @Res() res: Response) {
+  async getById(@Param() params, @Res() res: Response) {
     const result = await this.fishesService.findById(params.id);
 
     if (result.ok) {
@@ -52,7 +52,7 @@ export class FishesController {
   @Post()
   @ApiResponse({ status: 200, description: 'Success to create fish' })
   @ApiResponse({ status: 500, description: 'Failed to create fish' })
-  async createFish(@Res() res: Response, @Body() fish: any) {
+  async create(@Res() res: Response, @Body() fish: any) {
     try {
       await this.fishesService.create(fish);
       res.status(201);
@@ -68,7 +68,7 @@ export class FishesController {
   @ApiResponse({ status: 200, description: 'Update fish OK' })
   @ApiResponse({ status: 404, description: 'Fish does not exists' })
   @ApiResponse({ status: 500, description: 'Failed to update fish' })
-  async updateRoleRights(@Param() params, @Res() res: Response, @Body() fish: any) {
+  async update(@Param() params, @Res() res: Response, @Body() fish: any) {
     const result = await this.fishesService.updateOne(params.id, fish);
     if (result.ok) {
       res.status(201);
@@ -83,7 +83,7 @@ export class FishesController {
   @ApiResponse({ status: 200, description: 'Delete fish OK' })
   @ApiResponse({ status: 404, description: 'Fish does not exists' })
   @ApiResponse({ status: 500, description: 'Failed to delete fish' })
-  async deleteFish(@Param() params, @Res() res: Response) {
+  async delete(@Param() params, @Res() res: Response) {
     const result = await this.fishesService.deleteOne(params.id);
 
     if (result.ok) {
