@@ -19,7 +19,7 @@ async function bootstrap() {
 
 
   app.enableCors({
-    origin: /netlify\.app$/
+    origin: '*'
   });
   await app.listen(3000);
 }

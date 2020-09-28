@@ -6,6 +6,7 @@ export class DatabaseService {
   database: Db;
   fishesCollection = 'fishes';
   locationsCollection = 'locations';
+  sessionsCollection = 'sessions';
 
   constructor() {
     this.createDatabase('mongodb://localhost:27017/fishing-journal');
@@ -87,5 +88,30 @@ export class DatabaseService {
 
   async deleteLocation(id: string) {
     return await this.delete(this.database.collection(this.locationsCollection), id);
+  }
+ 
+  /**
+   * ==================================
+   * SESSIONS CRUD
+   * ==================================
+   */
+  async getAllSessions() {
+    return await this.getAll(this.database.collection(this.sessionsCollection));
+  }
+
+  async getOneSession(id: string) {
+    return await this.findOne(this.database.collection(this.sessionsCollection), id);
+  }
+
+  async createSession(session: any) {
+    return await this.create(this.database.collection(this.sessionsCollection), session);
+  }
+
+  async updateSession(id: string, session: any) {
+    return await this.update(this.database.collection(this.sessionsCollection), id, session);
+  }
+
+  async deleteSession(id: string) {
+    return await this.delete(this.database.collection(this.sessionsCollection), id);
   }
 }
