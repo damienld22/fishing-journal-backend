@@ -5,6 +5,9 @@ export class LocationDto {
   readonly id: string;
 
   @ApiProperty()
+  readonly name: string;
+  
+  @ApiProperty()
   readonly fishInfos: string;
   
   @ApiProperty()
