@@ -11,7 +11,7 @@ export class LocationDto {
   readonly fishInfos: string;
   
   @ApiProperty()
-  readonly location: object;
+  readonly location: any;
   
   @ApiProperty()
   readonly nightFishing: string;

@@ -64,6 +64,14 @@ export class DatabaseService {
   async deleteFish(id: string) {
     return await this.delete(this.database.collection(this.fishesCollection), id);
   }
+  async getFishesFromDates(start: number, end: number) {
+    return await this.database.collection(this.fishesCollection).find({
+      catchDate: {
+        $gte: start,
+        $lte: end
+      }
+    }).toArray()
+  }
 
   /**
    * ==================================

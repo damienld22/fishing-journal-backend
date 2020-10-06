@@ -28,6 +28,25 @@ export class SessionsService {
       }
     }
   }
+  
+  async findByIdWithDetails(id: string) {
+    try {
+      const element = await this.databaseService.getOneSession(id);
+      const fishes = await this.databaseService.getFishesFromDates(element.start, element.end);
+      const location = await this.databaseService.getOneLocation(element.location);
+
+      return {
+        ok: true,
+        session: { ...element, fishes, locationName: location.name}
+      }
+    } catch(err) {
+      console.error(err);
+
+      return {
+        ok: false
+      }
+    }
+  }
 
   async create(session: any) {
     return await this.databaseService.createSession(session);
