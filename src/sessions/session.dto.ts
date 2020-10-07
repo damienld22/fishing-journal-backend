@@ -15,6 +15,9 @@ export class SessionDto {
 
   @ApiProperty()
   readonly otherInformations: string;
+
+  @ApiProperty()
+  readonly comments: string;
 }
 
 export class SessionDetailsDto {
@@ -32,6 +35,9 @@ export class SessionDetailsDto {
 
   @ApiProperty()
   readonly otherInformations: string;
+
+  @ApiProperty()
+  readonly comments: string;
 
   @ApiProperty()
   readonly fishes: Array<any>;
