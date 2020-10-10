@@ -7,6 +7,7 @@ export class DatabaseService {
   fishesCollection = 'fishes';
   locationsCollection = 'locations';
   sessionsCollection = 'sessions';
+  listsCollection = 'lists';
 
   constructor() {
     this.createDatabase('mongodb://localhost:27017/fishing-journal');
@@ -122,4 +123,25 @@ export class DatabaseService {
   async deleteSession(id: string) {
     return await this.delete(this.database.collection(this.sessionsCollection), id);
   }
+
+  /**
+   * ==================================
+   * LIST CRUD
+   * ==================================
+   */
+  async getList() {
+    return await this.database.collection(this.listsCollection).findOne({});
+  }
+
+  async updateList(list: any) {
+    const currentList = await this.database.collection(this.listsCollection).findOne({ _id: new ObjectID(list._id)});
+
+    if (currentList) {
+      return await this.database.collection(this.listsCollection).updateOne(
+        { _id: new ObjectID(list.id) }, { elements: list.elements },
+      );
+    } else {
+      return await this.database.collection(this.listsCollection).insertOne(list)
+    }
+  } 
 }
