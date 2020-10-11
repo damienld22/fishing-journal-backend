@@ -13,12 +13,12 @@ export class ListController {
   @ApiResponse({ status: 200, description: 'Get fishing list', type: ListDto })
   @ApiResponse({ status: 500, description: 'Failed to get fishing list' })
   async find(@Res() res: Response) {
-    const result = await this.listService.findList();
-    if (result) {
-      res.send(result);
+    const { ok, list } = await this.listService.findList();
+    if (ok) {
+      res.json(list);
     } else {
       res.status(500);
-      res.json(result);
+      res.json(list);
     }
   }
 

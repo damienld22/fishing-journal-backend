@@ -134,11 +134,15 @@ export class DatabaseService {
   }
 
   async updateList(list: any) {
+    if (!list._id) {
+      return await this.database.collection(this.listsCollection).insertOne(list)
+    }
+
     const currentList = await this.database.collection(this.listsCollection).findOne({ _id: new ObjectID(list._id)});
 
     if (currentList) {
       return await this.database.collection(this.listsCollection).updateOne(
-        { _id: new ObjectID(list.id) }, { elements: list.elements },
+        { _id: new ObjectID(list._id) }, { $set: { elements: list.elements } },
       );
     } else {
       return await this.database.collection(this.listsCollection).insertOne(list)
