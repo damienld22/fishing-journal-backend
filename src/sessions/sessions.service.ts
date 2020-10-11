@@ -5,9 +5,9 @@ import { DatabaseService } from 'src/database.service';
 export class SessionsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(userId: string) {
     try {
-      return await this.databaseService.getAllSessions();
+      return await this.databaseService.getAllSessions(userId);
     } catch(err) {
       console.error(err);
       return { "message": "Failed to get all fishing sessions"}
@@ -29,10 +29,10 @@ export class SessionsService {
     }
   }
   
-  async findByIdWithDetails(id: string) {
+  async findByIdWithDetails(id: string, userId: string) {
     try {
       const element = await this.databaseService.getOneSession(id);
-      const fishes = await this.databaseService.getFishesFromDates(element.start, element.end);
+      const fishes = await this.databaseService.getFishesFromDates(element.start, element.end, userId);
       const location = await this.databaseService.getOneLocation(element.location);
 
       return {
@@ -48,8 +48,8 @@ export class SessionsService {
     }
   }
 
-  async create(session: any) {
-    return await this.databaseService.createSession(session);
+  async create(session: any, userId: string) {
+    return await this.databaseService.createSession(session, userId);
   }
 
   async updateOne(id: string, session: any) {

@@ -8,6 +8,7 @@ export class DatabaseService {
   locationsCollection = 'locations';
   sessionsCollection = 'sessions';
   listsCollection = 'lists';
+  usersCollection = 'users';
 
   constructor() {
     this.createDatabase('mongodb://localhost:27017/fishing-journal');
@@ -18,12 +19,12 @@ export class DatabaseService {
     this.database = client.db();
   }
 
-  private getAll(collection: Collection) {
-    return collection.find().toArray();
+  private getAll(collection: Collection, userId: string) {
+    return collection.find({ user: userId}).toArray();
   }
 
-  private create(collection: Collection, element: any) {
-    return collection.insertOne(element);
+  private create(collection: Collection, element: any, userId: string) {
+    return collection.insertOne({ ...element, user: userId});
   }
 
   private update(collection: Collection, id: string, element: any) {
@@ -46,16 +47,16 @@ export class DatabaseService {
    * FISHES CRUD
    * ==================================
    */
-  async getAllFishes() {
-    return await this.getAll(this.database.collection(this.fishesCollection));
+  async getAllFishes(userId: string) {
+    return await this.getAll(this.database.collection(this.fishesCollection), userId);
   }
 
   async getOneFish(id: string) {
     return await this.findOne(this.database.collection(this.fishesCollection), id);
   }
 
-  async createFish(fish: any) {
-    return await this.create(this.database.collection(this.fishesCollection), fish);
+  async createFish(fish: any, userId: string) {
+    return await this.create(this.database.collection(this.fishesCollection), fish, userId);
   }
 
   async updateFish(id: string, fish: any) {
@@ -65,8 +66,9 @@ export class DatabaseService {
   async deleteFish(id: string) {
     return await this.delete(this.database.collection(this.fishesCollection), id);
   }
-  async getFishesFromDates(start: number, end: number) {
+  async getFishesFromDates(start: number, end: number, userId: string) {
     return await this.database.collection(this.fishesCollection).find({
+      user: userId,
       catchDate: {
         $gte: start,
         $lte: end
@@ -79,16 +81,16 @@ export class DatabaseService {
    * LOCATIONS CRUD
    * ==================================
    */
-  async getAllLocations() {
-    return await this.getAll(this.database.collection(this.locationsCollection));
+  async getAllLocations(userId: string) {
+    return await this.getAll(this.database.collection(this.locationsCollection), userId);
   }
 
   async getOneLocation(id: string) {
     return await this.findOne(this.database.collection(this.locationsCollection), id);
   }
 
-  async createLocation(location: any) {
-    return await this.create(this.database.collection(this.locationsCollection), location);
+  async createLocation(location: any, userId: string) {
+    return await this.create(this.database.collection(this.locationsCollection), location, userId);
   }
 
   async updateLocation(id: string, location: any) {
@@ -104,16 +106,16 @@ export class DatabaseService {
    * SESSIONS CRUD
    * ==================================
    */
-  async getAllSessions() {
-    return await this.getAll(this.database.collection(this.sessionsCollection));
+  async getAllSessions(userId: string) {
+    return await this.getAll(this.database.collection(this.sessionsCollection), userId);
   }
 
   async getOneSession(id: string) {
     return await this.findOne(this.database.collection(this.sessionsCollection), id);
   }
 
-  async createSession(session: any) {
-    return await this.create(this.database.collection(this.sessionsCollection), session);
+  async createSession(session: any, userId: string) {
+    return await this.create(this.database.collection(this.sessionsCollection), session, userId);
   }
 
   async updateSession(id: string, session: any) {
@@ -129,8 +131,8 @@ export class DatabaseService {
    * LIST CRUD
    * ==================================
    */
-  async getList() {
-    return await this.database.collection(this.listsCollection).findOne({});
+  async getList(userId: string) {
+    return await this.database.collection(this.listsCollection).findOne({user: userId});
   }
 
   async updateList(list: any) {
@@ -147,5 +149,27 @@ export class DatabaseService {
     } else {
       return await this.database.collection(this.listsCollection).insertOne(list)
     }
-  } 
+  }
+  
+  /**
+   * ==================================
+   * USERS CRUD
+   * ==================================
+   */
+  async getUserFromId(id: string) {
+    return await this.database.collection(this.usersCollection).findOne({ _id: new ObjectID(id)});
+  }
+
+  async getUserFromLoginAndPassword(username: string, password: string) {
+    return await this.database.collection(this.usersCollection).findOne({ username, password });
+  }
+
+  async createUser(username: string, password: string) {
+    return await this.database.collection(this.usersCollection).insertOne({ username, password });
+  }
+
+  async getUserFromUsername(username: string) {
+    return await this.database.collection(this.usersCollection).findOne({ username });
+  }
+
 }

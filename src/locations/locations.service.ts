@@ -5,9 +5,9 @@ import { DatabaseService } from 'src/database.service';
 export class LocationsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(userId: string) {
     try {
-      return await this.databaseService.getAllLocations();
+      return await this.databaseService.getAllLocations(userId);
     } catch(err) {
       console.error(err);
       return { "message": "Failed to get all locations"}
@@ -29,8 +29,8 @@ export class LocationsService {
     }
   }
 
-  async create(location: any) {
-    return await this.databaseService.createLocation(location);
+  async create(location: any, userId: string) {
+    return await this.databaseService.createLocation(location, userId);
   }
 
   async updateOne(id: string, location: any) {

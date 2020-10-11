@@ -1,10 +1,12 @@
-import { Controller, Get, Body, Res, Param, Post, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Body, Res, Param, Post, Delete, Put, UseGuards, Req } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { SessionDto } from './session.dto';
 import { SessionsService } from './sessions.service';
+import { JwtAuthGuard } from '../authentication/jwt-auth.guard';
 
 @ApiTags('sessions')
+@UseGuards(JwtAuthGuard)
 @Controller('sessions')
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
@@ -12,8 +14,9 @@ export class SessionsController {
   @Get()
   @ApiResponse({ status: 200, description: 'Get all fishing sessions', type: [SessionDto] })
   @ApiResponse({ status: 500, description: 'Failed to get all fishing sessions' })
-  async findAll(@Res() res: Response) {
-    const result = await this.sessionsService.findAll();
+  async findAll(@Req() req, @Res() res: Response) {
+    const userId = req.user._id;
+    const result = await this.sessionsService.findAll(userId);
     if (Array.isArray(result)) {
       res.send(result);
     } else {
@@ -53,8 +56,9 @@ export class SessionsController {
   @ApiResponse({ status: 200, description: 'Get one fishing session with details' })
   @ApiResponse({ status: 404, description: 'Fishing session does not exists' })
   @ApiResponse({ status: 500, description: 'Failed to get fishing session details by ID' })
-  async getByIdWithDetails(@Param() params, @Res() res: Response) {
-    const result = await this.sessionsService.findByIdWithDetails(params.id);
+  async getByIdWithDetails(@Req() req, @Param() params, @Res() res: Response) {
+    const userId = req.user._id;
+    const result = await this.sessionsService.findByIdWithDetails(params.id, userId);
 
     if (result.ok) {
       if (result.session) {
@@ -79,9 +83,10 @@ export class SessionsController {
   @Post()
   @ApiResponse({ status: 200, description: 'Success to create fishing session' })
   @ApiResponse({ status: 500, description: 'Failed to create fishing session' })
-  async create(@Res() res: Response, @Body() session: any) {
+  async create(@Req() req, @Res() res: Response, @Body() session: any) {
     try {
-      await this.sessionsService.create(session);
+      const userId = req.user._id;
+      await this.sessionsService.create(session, userId);
       res.status(201);
       res.send();
     } catch(err) {

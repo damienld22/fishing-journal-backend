@@ -1,10 +1,12 @@
-import { Controller, Get, Body, Res, Param, Post, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Body, Res, Param, Post, Delete, Put, UseGuards, Req } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { LocationDto } from './location.dto';
 import { LocationsService } from './locations.service';
+import { JwtAuthGuard } from '../authentication/jwt-auth.guard';
 
 @ApiTags('locations')
+@UseGuards(JwtAuthGuard)
 @Controller('locations')
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
@@ -12,8 +14,9 @@ export class LocationsController {
   @Get()
   @ApiResponse({ status: 200, description: 'Get all locations', type: [LocationDto] })
   @ApiResponse({ status: 500, description: 'Failed to get all locations' })
-  async findAll(@Res() res: Response) {
-    const result = await this.locationsService.findAll();
+  async findAll(@Req() req, @Res() res: Response) {
+    const userId = req.user._id;
+    const result = await this.locationsService.findAll(userId);
     if (Array.isArray(result)) {
       res.send(result);
     } else {
@@ -52,9 +55,10 @@ export class LocationsController {
   @Post()
   @ApiResponse({ status: 200, description: 'Success to create location' })
   @ApiResponse({ status: 500, description: 'Failed to create location' })
-  async create(@Res() res: Response, @Body() location: any) {
+  async create(@Req() req, @Res() res: Response, @Body() location: any) {
     try {
-      await this.locationsService.create(location);
+      const userId = req.user._id;
+      await this.locationsService.create(location, userId);
       res.status(201);
       res.send();
     } catch(err) {

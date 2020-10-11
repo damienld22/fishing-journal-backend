@@ -5,9 +5,9 @@ import { DatabaseService } from 'src/database.service';
 export class FishesService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(userId: string) {
     try {
-      return await this.databaseService.getAllFishes();
+      return await this.databaseService.getAllFishes(userId);
     } catch(err) {
       console.error(err);
       return { "message": "Failed to get all fishes"}
@@ -29,8 +29,8 @@ export class FishesService {
     }
   }
 
-  async create(fish: any) {
-    return await this.databaseService.createFish(fish);
+  async create(fish: any, userId: string) {
+    return await this.databaseService.createFish(fish, userId);
   }
 
   async updateOne(id: string, fish: any) {

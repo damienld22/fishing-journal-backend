@@ -1,10 +1,12 @@
-import { Controller, Get, Body, Res, Post } from '@nestjs/common';
+import { Controller, Get, Body, Res, Post, UseGuards, Req } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { ListDto } from './list.dto';
 import { ListService } from './list.service';
+import { JwtAuthGuard } from '../authentication/jwt-auth.guard';
 
 @ApiTags('list')
+@UseGuards(JwtAuthGuard)
 @Controller('list')
 export class ListController {
   constructor(private readonly listService: ListService) {}
@@ -12,8 +14,9 @@ export class ListController {
   @Get()
   @ApiResponse({ status: 200, description: 'Get fishing list', type: ListDto })
   @ApiResponse({ status: 500, description: 'Failed to get fishing list' })
-  async find(@Res() res: Response) {
-    const { ok, list } = await this.listService.findList();
+  async find(@Req() req, @Res() res: Response) {
+    const userId = req.user._id;
+    const { ok, list } = await this.listService.findList(userId);
     if (ok) {
       res.json(list);
     } else {

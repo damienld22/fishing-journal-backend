@@ -1,10 +1,12 @@
-import { Controller, Get, Body, Res, Param, Post, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Body, Res, Param, Post, Delete, Put, UseGuards, Request, Req } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { FishDto } from './fish.dto';
 import { FishesService } from './fishes.service';
+import { JwtAuthGuard } from '../authentication/jwt-auth.guard';
 
 @ApiTags('fishes')
+@UseGuards(JwtAuthGuard)
 @Controller('fishes')
 export class FishesController {
   constructor(private readonly fishesService: FishesService) {}
@@ -12,8 +14,9 @@ export class FishesController {
   @Get()
   @ApiResponse({ status: 200, description: 'Get all fishes', type: [FishDto] })
   @ApiResponse({ status: 500, description: 'Failed to get all fishes' })
-  async findAll(@Res() res: Response) {
-    const result = await this.fishesService.findAll();
+  async findAll(@Request() req, @Res() res: Response) {
+    const userId = req.user._id;
+    const result = await this.fishesService.findAll(userId);
     if (Array.isArray(result)) {
       res.send(result);
     } else {
@@ -52,9 +55,10 @@ export class FishesController {
   @Post()
   @ApiResponse({ status: 200, description: 'Success to create fish' })
   @ApiResponse({ status: 500, description: 'Failed to create fish' })
-  async create(@Res() res: Response, @Body() fish: any) {
+  async create(@Req() req, @Res() res: Response, @Body() fish: any) {
+    const userId = req.user._id;
     try {
-      await this.fishesService.create(fish);
+      await this.fishesService.create(fish, userId);
       res.status(201);
       res.send();
     } catch(err) {
