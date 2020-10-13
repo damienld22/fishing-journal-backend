@@ -1,14 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ListDto {
-  @ApiProperty()
-  readonly id: string;
-
-  @ApiProperty()
-  readonly elements: Array<ElementListDto>;
-}
-
-export class ElementListDto {
+export class ReferenceDto {
   @ApiProperty()
   readonly id: string;
 
@@ -16,7 +8,7 @@ export class ElementListDto {
   readonly name: string;
   
   @ApiProperty()
-  readonly checked: boolean;
+  readonly link: string;
 
   @ApiProperty()
   readonly category: string;

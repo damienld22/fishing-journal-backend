@@ -9,6 +9,7 @@ export class DatabaseService {
   sessionsCollection = 'sessions';
   listsCollection = 'lists';
   usersCollection = 'users';
+  referencesCollection = 'references';
 
   constructor() {
     this.createDatabase('mongodb://localhost:27017/fishing-journal');
@@ -19,8 +20,10 @@ export class DatabaseService {
     this.database = client.db();
   }
 
-  private getAll(collection: Collection, userId: string) {
-    return collection.find({ user: userId}).toArray();
+  private getAll(collection: Collection, userId: string, sortKey?: string) {
+    const pointer = collection.find({ user: userId});
+    pointer.sort({ [sortKey]: -1});
+    return pointer.toArray();
   }
 
   private create(collection: Collection, element: any, userId: string) {
@@ -48,7 +51,7 @@ export class DatabaseService {
    * ==================================
    */
   async getAllFishes(userId: string) {
-    return await this.getAll(this.database.collection(this.fishesCollection), userId);
+    return await this.getAll(this.database.collection(this.fishesCollection), userId, 'catchDate');
   }
 
   async getOneFish(id: string) {
@@ -107,7 +110,7 @@ export class DatabaseService {
    * ==================================
    */
   async getAllSessions(userId: string) {
-    return await this.getAll(this.database.collection(this.sessionsCollection), userId);
+    return await this.getAll(this.database.collection(this.sessionsCollection), userId, 'start');
   }
 
   async getOneSession(id: string) {
@@ -170,6 +173,27 @@ export class DatabaseService {
 
   async getUserFromUsername(username: string) {
     return await this.database.collection(this.usersCollection).findOne({ username });
+  }
+
+  /**
+   * ==================================
+   * REFERENCES CRUD
+   * ==================================
+   */
+  async getAllReferences(userId: string) {
+    return await this.getAll(this.database.collection(this.referencesCollection), userId);
+  }
+
+  async createReference(reference: any, userId: string) {
+    return await this.create(this.database.collection(this.referencesCollection), reference, userId);
+  }
+
+  async updateReference(id: string, reference: any) {
+    return await this.update(this.database.collection(this.referencesCollection), id, reference);
+  }
+
+  async deleteReference(id: string) {
+    return await this.delete(this.database.collection(this.referencesCollection), id);
   }
 
 }
