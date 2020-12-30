@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { model, Schema, Model, Document } from 'mongoose';
 
 export class SessionDto {
   @ApiProperty()
@@ -45,3 +46,27 @@ export class SessionDetailsDto {
   @ApiProperty()
   readonly locationName: string;
 }
+
+export interface ISession extends Document {
+  start: number;
+  end: number;
+  location: string;
+  otherInformations: string;
+  comments: string;
+  fishes: Array<any>;
+  locationName: string;
+  user: string;
+}
+
+const SessionSchema: Schema = new Schema({
+  start: { type: Number},
+  end: { type: Number},
+  location: { type: String},
+  otherInformations: { type: String},
+  comments: { type: String},
+  fish: { type: Array},
+  locationName: { type: String },
+  user: { type: String }
+});
+
+export const SessionModel: Model<ISession> = model('Session', SessionSchema);

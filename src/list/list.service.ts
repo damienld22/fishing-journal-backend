@@ -20,7 +20,7 @@ export class ListService {
     }
   }
 
-  async updateList(list: any) {
-    return await this.databaseService.updateList(list);
+  async updateList(list: any, userId: string) {
+    return await this.databaseService.updateList(list, userId);
   }
 }

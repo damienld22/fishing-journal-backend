@@ -1,23 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { MongoClient, Db, ObjectID, Collection } from 'mongodb';
+import { ObjectID, Collection } from 'mongodb';
+import { connect } from 'mongoose';
+import { FishModel } from './fishes/fish.dto';
+import { ListModel } from './list/list.dto';
+import { LocationModel } from './locations/location.dto';
+import { SessionModel } from './sessions/session.dto';
+import { UserModel } from './authentication/authentication.dto';
+import { ReferenceModel } from './references/reference.dto';
 
 @Injectable()
 export class DatabaseService {
-  database: Db;
-  fishesCollection = 'fishes';
-  locationsCollection = 'locations';
-  sessionsCollection = 'sessions';
-  listsCollection = 'lists';
-  usersCollection = 'users';
-  referencesCollection = 'references';
-
   constructor() {
-    this.createDatabase('mongodb://localhost:27017/fishing-journal');
+    this.createDatabase('mongodb://localhost:27017/fishing-journal')
   }
 
   async createDatabase(url: string) {
-    const client = await MongoClient.connect(url, { useUnifiedTopology: true });
-    this.database = client.db();
+    connect(url ,{useNewUrlParser: true, useUnifiedTopology: true})
+    .then(() => {
+      console.log('connected to database')
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    })
   }
 
   private getAll(collection: Collection, userId: string, sortKey?: string) {
@@ -51,32 +56,33 @@ export class DatabaseService {
    * ==================================
    */
   async getAllFishes(userId: string) {
-    return await this.getAll(this.database.collection(this.fishesCollection), userId, 'catchDate');
+    return await FishModel.find({ user: userId}).sort({ 'catchDate': -1}).exec();
   }
 
   async getOneFish(id: string) {
-    return await this.findOne(this.database.collection(this.fishesCollection), id);
+    return await FishModel.findById(id).exec();
   }
 
   async createFish(fish: any, userId: string) {
-    return await this.create(this.database.collection(this.fishesCollection), fish, userId);
+    const newFish = new FishModel({ ...fish, user: userId});
+    return await newFish.save();
   }
 
   async updateFish(id: string, fish: any) {
-    return await this.update(this.database.collection(this.fishesCollection), id, fish);
+    return await FishModel.findByIdAndUpdate(id, fish).exec();
   }
 
   async deleteFish(id: string) {
-    return await this.delete(this.database.collection(this.fishesCollection), id);
+    return await FishModel.findByIdAndDelete(id).exec();
   }
+
   async getFishesFromDates(start: number, end: number, userId: string) {
-    return await this.database.collection(this.fishesCollection).find({
+    return await FishModel.find({ 
       user: userId,
       catchDate: {
         $gte: start,
         $lte: end
-      }
-    }).toArray()
+    }}).sort({ 'catchDate': -1}) .exec();
   }
 
   /**
@@ -85,23 +91,24 @@ export class DatabaseService {
    * ==================================
    */
   async getAllLocations(userId: string) {
-    return await this.getAll(this.database.collection(this.locationsCollection), userId);
+    return await LocationModel.find({ user: userId}).exec();
   }
 
   async getOneLocation(id: string) {
-    return await this.findOne(this.database.collection(this.locationsCollection), id);
+    return await LocationModel.findById(id);
   }
 
   async createLocation(location: any, userId: string) {
-    return await this.create(this.database.collection(this.locationsCollection), location, userId);
+    const newLocation = new LocationModel({ ...location, user: userId});
+    return await newLocation.save();
   }
 
   async updateLocation(id: string, location: any) {
-    return await this.update(this.database.collection(this.locationsCollection), id, location);
+    return await LocationModel.findByIdAndUpdate(id, location).exec();
   }
 
   async deleteLocation(id: string) {
-    return await this.delete(this.database.collection(this.locationsCollection), id);
+    return await LocationModel.findByIdAndDelete(id).exec();
   }
  
   /**
@@ -110,23 +117,24 @@ export class DatabaseService {
    * ==================================
    */
   async getAllSessions(userId: string) {
-    return await this.getAll(this.database.collection(this.sessionsCollection), userId, 'start');
+    return await SessionModel.find({ user: userId}).sort({ 'start': -1}).exec();
   }
 
   async getOneSession(id: string) {
-    return await this.findOne(this.database.collection(this.sessionsCollection), id);
+    return await SessionModel.findById(id);
   }
 
   async createSession(session: any, userId: string) {
-    return await this.create(this.database.collection(this.sessionsCollection), session, userId);
+    const newSession = new SessionModel({ ...session, user: userId});
+    return await newSession.save();
   }
 
   async updateSession(id: string, session: any) {
-    return await this.update(this.database.collection(this.sessionsCollection), id, session);
+    return await SessionModel.findByIdAndUpdate(id, session).exec();
   }
 
   async deleteSession(id: string) {
-    return await this.delete(this.database.collection(this.sessionsCollection), id);
+    return await SessionModel.findByIdAndDelete(id).exec();
   }
 
   /**
@@ -135,22 +143,19 @@ export class DatabaseService {
    * ==================================
    */
   async getList(userId: string) {
-    return await this.database.collection(this.listsCollection).findOne({user: userId});
+    return await ListModel.findOne({ user: userId}).exec();
   }
 
-  async updateList(list: any) {
+  async updateList(list: any, userId: string) {
     if (!list._id) {
-      return await this.database.collection(this.listsCollection).insertOne(list)
-    }
-
-    const currentList = await this.database.collection(this.listsCollection).findOne({ _id: new ObjectID(list._id)});
-
-    if (currentList) {
-      return await this.database.collection(this.listsCollection).updateOne(
-        { _id: new ObjectID(list._id) }, { $set: { elements: list.elements } },
-      );
+      const newList = new ListModel({ ...list, user: userId})
+      return await newList.save();
     } else {
-      return await this.database.collection(this.listsCollection).insertOne(list)
+      const currentList = await ListModel.findById(list._id);
+  
+      if (currentList) {
+        return await ListModel.findByIdAndUpdate(list._id, { $set: { elements: list.elements }}).exec();
+      }
     }
   }
   
@@ -160,19 +165,20 @@ export class DatabaseService {
    * ==================================
    */
   async getUserFromId(id: string) {
-    return await this.database.collection(this.usersCollection).findOne({ _id: new ObjectID(id)});
+    return await UserModel.findById(id);
   }
 
   async getUserFromLoginAndPassword(username: string, password: string) {
-    return await this.database.collection(this.usersCollection).findOne({ username, password });
+    return await UserModel.findOne({ username, password }).exec();
   }
 
   async createUser(username: string, password: string) {
-    return await this.database.collection(this.usersCollection).insertOne({ username, password });
+    const newUser = new UserModel({username, password});
+    return await newUser.save();
   }
 
   async getUserFromUsername(username: string) {
-    return await this.database.collection(this.usersCollection).findOne({ username });
+    return await UserModel.findOne({ username }).exec();
   }
 
   /**
@@ -181,19 +187,19 @@ export class DatabaseService {
    * ==================================
    */
   async getAllReferences(userId: string) {
-    return await this.getAll(this.database.collection(this.referencesCollection), userId);
+    return await ReferenceModel.find({ user: userId}).exec();
   }
 
   async createReference(reference: any, userId: string) {
-    return await this.create(this.database.collection(this.referencesCollection), reference, userId);
+    const newReference = new ReferenceModel({ ...reference, user: userId});
+    return await newReference.save();
   }
 
   async updateReference(id: string, reference: any) {
-    return await this.update(this.database.collection(this.referencesCollection), id, reference);
+    return await ReferenceModel.findByIdAndUpdate(id, reference).exec();
   }
 
   async deleteReference(id: string) {
-    return await this.delete(this.database.collection(this.referencesCollection), id);
+    return await ReferenceModel.findByIdAndDelete(id).exec();
   }
-
 }

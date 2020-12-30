@@ -28,9 +28,10 @@ export class ListController {
   @Post()
   @ApiResponse({ status: 200, description: 'Success to update fishing list' })
   @ApiResponse({ status: 500, description: 'Failed to update fishing list' })
-  async update(@Res() res: Response, @Body() list: any) {
+  async update(@Req() req, @Res() res: Response, @Body() list: any) {
     try {
-      await this.listService.updateList(list);
+      const userId = req.user._id;
+      await this.listService.updateList(list, userId);
       res.status(201);
       res.send();
     } catch(err) {
