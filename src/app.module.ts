@@ -15,11 +15,20 @@ import { AuthenticationController } from './authentication/authentication.contro
 import { ReferencesService } from './references/references.service';
 import { ReferencesController } from './references/reference.controller';
 import { JwtStrategy } from './authentication/jwt.strategy';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [PassportModule, JwtModule.register({
     secret: 'secret-key-journal-fishing'
-  })],
+  }),
+  MulterModule.register({
+    dest: './images',
+  }),
+  ServeStaticModule.forRoot({
+    rootPath: join(__dirname, '..', 'images'),
+  }),],
   controllers: [FishesController, LocationsController, SessionsController, ListController, AuthenticationController, ReferencesController],
   providers: [FishesService, LocationsService, DatabaseService, SessionsService, ListService, AuthenticationService, JwtStrategy, ReferencesService],
 })

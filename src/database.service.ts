@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectID, Collection } from 'mongodb';
 import { connect } from 'mongoose';
 import { FishModel } from './fishes/fish.dto';
 import { ListModel } from './list/list.dto';
@@ -23,31 +22,6 @@ export class DatabaseService {
       console.error(err);
       process.exit(1);
     })
-  }
-
-  private getAll(collection: Collection, userId: string, sortKey?: string) {
-    const pointer = collection.find({ user: userId});
-    pointer.sort({ [sortKey]: -1});
-    return pointer.toArray();
-  }
-
-  private create(collection: Collection, element: any, userId: string) {
-    return collection.insertOne({ ...element, user: userId});
-  }
-
-  private update(collection: Collection, id: string, element: any) {
-    return collection.updateOne(
-      { _id: new ObjectID(id) },
-      { $set: element},
-    );
-  }
-
-  private delete(collection: Collection, id: string) {
-    return collection.deleteOne({ _id: new ObjectID(id)});
-  }
-
-  private findOne(collection: Collection, id: string) {
-    return collection.findOne({ _id: new ObjectID(id)});
   }
 
   /**

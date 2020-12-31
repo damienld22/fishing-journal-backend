@@ -1,9 +1,12 @@
-import { Controller, Get, Body, Res, Param, Post, Delete, Put, UseGuards, Request, Req } from '@nestjs/common';
+import { Controller, Get, Body, Res, Param, Post, Delete, Put, UseGuards, Request, Req, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { FishDto } from './fish.dto';
 import { FishesService } from './fishes.service';
 import { JwtAuthGuard } from '../authentication/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from  'multer';
+import { editFileName, imageFileFilter } from 'src/utils-upload-images';
 
 @ApiTags('fishes')
 @UseGuards(JwtAuthGuard)
@@ -97,5 +100,25 @@ export class FishesController {
       res.status(500);
       res.json({"message": "Internal error"});
     }
+  }
+
+  @Post('picture')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './images',
+      filename: editFileName,
+    }),
+    fileFilter: imageFileFilter,
+  }))
+  async uploadFile(@UploadedFile() file, @Res() res: Response) {
+    const response = {
+      originalname: file.originalname,
+      filename: file.filename,
+    };
+    res.json({
+      status: 200,
+      message: 'Image uploaded successfully!',
+      data: response,
+    });
   }
 }
