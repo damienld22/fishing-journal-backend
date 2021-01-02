@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { Controller, Get, Body, Res, Param, Post, Delete, Put, UseGuards, Request, Req, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
@@ -7,6 +8,8 @@ import { JwtAuthGuard } from '../authentication/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from  'multer';
 import { editFileName, imageFileFilter } from 'src/utils-upload-images';
+import { join } from 'path';
+
 
 @ApiTags('fishes')
 @UseGuards(JwtAuthGuard)
@@ -92,6 +95,15 @@ export class FishesController {
   @ApiResponse({ status: 500, description: 'Failed to delete fish' })
   async delete(@Param() params, @Res() res: Response) {
     const result = await this.fishesService.deleteOne(params.id);
+
+    try {
+      if (result.ok) {
+        const splitted = result.deleted.picture.split('/');
+        fs.unlinkSync(join(__dirname, '../..', 'images', splitted[splitted.length - 1]));
+      }
+    } catch(err) {
+      console.error(err);
+    }
 
     if (result.ok) {
       res.status(204);

@@ -45,8 +45,8 @@ export class FishesService {
 
   async deleteOne(id: string) {
     try {
-      await this.databaseService.deleteFish(id);
-      return { ok: true };
+      const deleted = await this.databaseService.deleteFish(id);
+      return { ok: true, deleted };
     } catch(err) {
       console.error(err);
       return { ok: false };
