@@ -12,7 +12,7 @@ export class FishDto {
   readonly catchDate: number;
   
   @ApiProperty()
-  readonly picture: string; // Encoded in base64
+  readonly picture: string;
 
   @ApiProperty()
   readonly bait: string;

@@ -18,6 +18,8 @@ import { JwtStrategy } from './authentication/jwt.strategy';
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { StationsController } from './stations/stations.controller';
+import { StationsService } from './stations/stations.service';
 
 @Module({
   imports: [PassportModule, JwtModule.register({
@@ -29,7 +31,7 @@ import { join } from 'path';
   ServeStaticModule.forRoot({
     rootPath: join(__dirname, '..', 'images'),
   }),],
-  controllers: [FishesController, LocationsController, SessionsController, ListController, AuthenticationController, ReferencesController],
-  providers: [FishesService, LocationsService, DatabaseService, SessionsService, ListService, AuthenticationService, JwtStrategy, ReferencesService],
+  controllers: [FishesController, LocationsController, SessionsController, ListController, AuthenticationController, ReferencesController, StationsController],
+  providers: [FishesService, LocationsService, DatabaseService, SessionsService, ListService, AuthenticationService, JwtStrategy, ReferencesService, StationsService],
 })
 export class AppModule {}

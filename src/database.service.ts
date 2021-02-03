@@ -6,6 +6,7 @@ import { LocationModel } from './locations/location.dto';
 import { SessionModel } from './sessions/session.dto';
 import { UserModel } from './authentication/authentication.dto';
 import { ReferenceModel } from './references/reference.dto';
+import { StationModel } from './stations/stations.dto';
 
 @Injectable()
 export class DatabaseService {
@@ -175,5 +176,31 @@ export class DatabaseService {
 
   async deleteReference(id: string) {
     return await ReferenceModel.findByIdAndDelete(id).exec();
+  }
+
+  /**
+   * ==================================
+   * STATIONS CRUD
+   * ==================================
+   */
+  async getAllStationsByLocation(userId: string, location: string) {
+    return await StationModel.find({ user: userId, location }).exec();
+  }
+
+  async getOneStation(id: string) {
+    return await StationModel.findById(id);
+  }
+
+  async createStation(station: any, userId: string) {
+    const newStation = new StationModel({ ...station, user: userId});
+    return await newStation.save();
+  }
+
+  async updateStation(id: string, station: any) {
+    return await StationModel.findByIdAndUpdate(id, station).exec();
+  }
+
+  async deleteStation(id: string) {
+    return await StationModel.findByIdAndDelete(id).exec();
   }
 }
