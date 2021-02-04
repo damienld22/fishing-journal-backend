@@ -26,6 +26,7 @@ export class StationDto {
 
 export interface IStation extends Document {
   picture: string;
+  user: string;
   location: string;
   distance: number;
   depth: number;
@@ -35,6 +36,7 @@ export interface IStation extends Document {
 
 const StationSchema: Schema = new Schema({
   picture: { type: String },
+  user: { type: String},
   location: { type: String },
   description: { type: String },
   distance: { type: Number },

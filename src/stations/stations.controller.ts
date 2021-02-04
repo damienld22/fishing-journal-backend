@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Controller, Get, Body, Res, Param, Post, Delete, Put, UseGuards, Request, Req, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Body, Res, Param, Post, Delete, Put, UseGuards, Request, Req, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { StationDto } from './stations.dto';
@@ -20,9 +20,9 @@ export class StationsController {
   @Get()
   @ApiResponse({ status: 200, description: 'Get all stations by location', type: [StationDto] })
   @ApiResponse({ status: 500, description: 'Failed to get all stations' })
-  async findAllByLocation(@Request() req, @Res() res: Response, @Body() entry: any) {
+  async findAllByLocation(@Request() req, @Res() res: Response, @Query('location') location) {
     const userId = req.user._id;
-    const location = entry.location;
+
     const result = await this.stationsService.findAllByLocation(userId, location);
     if (Array.isArray(result)) {
       res.send(result);
