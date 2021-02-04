@@ -12,6 +12,9 @@ export class StationDto {
   readonly location: string;
 
   @ApiProperty()
+  readonly description: string;
+
+  @ApiProperty()
   readonly distance: number;
 
   @ApiProperty()
@@ -27,11 +30,13 @@ export interface IStation extends Document {
   distance: number;
   depth: number;
   orientation: number;
+  description: string;
 }
 
 const StationSchema: Schema = new Schema({
   picture: { type: String },
   location: { type: String },
+  description: { type: String },
   distance: { type: Number },
   depth: { type: Number },
   orientation: { type: Number }
