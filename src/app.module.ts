@@ -20,6 +20,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { StationsController } from './stations/stations.controller';
 import { StationsService } from './stations/stations.service';
+import { DecisionHelpController } from './decisionHelp/decisionHelp.controller';
+import { DecisionHelpService } from './decisionHelp/decisionHelp.service';
 
 @Module({
   imports: [PassportModule, JwtModule.register({
@@ -31,7 +33,7 @@ import { StationsService } from './stations/stations.service';
   ServeStaticModule.forRoot({
     rootPath: join(__dirname, '..', 'images'),
   }),],
-  controllers: [FishesController, LocationsController, SessionsController, ListController, AuthenticationController, ReferencesController, StationsController],
-  providers: [FishesService, LocationsService, DatabaseService, SessionsService, ListService, AuthenticationService, JwtStrategy, ReferencesService, StationsService],
+  controllers: [FishesController, LocationsController, SessionsController, ListController, AuthenticationController, ReferencesController, StationsController, DecisionHelpController],
+  providers: [FishesService, LocationsService, DatabaseService, SessionsService, ListService, AuthenticationService, JwtStrategy, ReferencesService, StationsService, DecisionHelpService],
 })
 export class AppModule {}

@@ -7,6 +7,7 @@ import { SessionModel } from './sessions/session.dto';
 import { UserModel } from './authentication/authentication.dto';
 import { ReferenceModel } from './references/reference.dto';
 import { StationModel } from './stations/stations.dto';
+import { DecisionHelpDto, DecisionHelpModel } from './decisionHelp/decisionHelp.dto';
 
 @Injectable()
 export class DatabaseService {
@@ -130,6 +131,28 @@ export class DatabaseService {
   
       if (currentList) {
         return await ListModel.findByIdAndUpdate(list._id, { $set: { elements: list.elements }}).exec();
+      }
+    }
+  }
+  
+  /**
+   * ==================================
+   * DECISION HELP CRUD
+   * ==================================
+   */
+  async getDecisionHelp(userId: string) {
+    return await DecisionHelpModel.findOne({ user: userId}).exec();
+  }
+
+  async update(userId: string, decisionHelp: DecisionHelpDto) {
+    if (!decisionHelp._id) {
+      const newDecisionHelp = new DecisionHelpModel({ ...decisionHelp, user: userId})
+      return await newDecisionHelp.save();
+    } else {
+      const currentDecisionHelp = await DecisionHelpModel.findById(decisionHelp._id);
+  
+      if (currentDecisionHelp) {
+        return await DecisionHelpModel.findByIdAndUpdate(decisionHelp._id, { $set: decisionHelp}).exec();
       }
     }
   }
