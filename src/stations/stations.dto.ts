@@ -9,6 +9,9 @@ export class StationDto {
   readonly name: string;
 
   @ApiProperty()
+  readonly markers: Array<any>;
+
+  @ApiProperty()
   readonly picture: string;
 
   @ApiProperty()
@@ -30,6 +33,7 @@ export class StationDto {
 export interface IStation extends Document {
   name: string;
   picture: string;
+  markers: any[];
   user: string;
   location: string;
   distance: number;
@@ -41,6 +45,7 @@ export interface IStation extends Document {
 const StationSchema: Schema = new Schema({
   name: { type: String },
   picture: { type: String },
+  markers: { type: Array },
   user: { type: String},
   location: { type: String },
   description: { type: String },
