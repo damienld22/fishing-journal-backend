@@ -6,6 +6,9 @@ export class StationDto {
   readonly id: string;
 
   @ApiProperty()
+  readonly name: string;
+
+  @ApiProperty()
   readonly picture: string;
 
   @ApiProperty()
@@ -25,6 +28,7 @@ export class StationDto {
 }
 
 export interface IStation extends Document {
+  name: string;
   picture: string;
   user: string;
   location: string;
@@ -35,6 +39,7 @@ export interface IStation extends Document {
 }
 
 const StationSchema: Schema = new Schema({
+  name: { type: String },
   picture: { type: String },
   user: { type: String},
   location: { type: String },
