@@ -146,7 +146,7 @@ export class DatabaseService {
 
   async update(userId: string, decisionHelp: DecisionHelpDto) {
     if (!decisionHelp._id) {
-      const newDecisionHelp = new DecisionHelpModel({ ...decisionHelp, user: userId})
+      const newDecisionHelp = new DecisionHelpModel({ ...decisionHelp, user: userId});
       return await newDecisionHelp.save();
     } else {
       const currentDecisionHelp = await DecisionHelpModel.findById(decisionHelp._id);

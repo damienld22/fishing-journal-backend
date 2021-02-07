@@ -1,10 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { model, Schema, Model, Document } from 'mongoose';
 
-export interface DecisionHelpElement {
+export interface DecisionHelpCategory {
   category: string;
-  name: string;
-  description: string;
+  elts: Array<any>;
 }
 
 export class DecisionHelpDto {
@@ -15,12 +14,12 @@ export class DecisionHelpDto {
   readonly parameters: Array<string>;
   
   @ApiProperty()
-  readonly elements: Array<DecisionHelpElement>;
+  readonly elements: Array<DecisionHelpCategory>;
 }
 
 export interface IDecisionHelp extends Document {
   parameters: Array<string>;
-  elements: Array<DecisionHelpElement>;
+  elements: Array<DecisionHelpCategory>;
   user: string;
 }
 
